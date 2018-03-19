@@ -1,0 +1,8 @@
+version = "%{version}%"
+description = "[@@deriving argparse]"
+requires(-ppx_driver) = "ppx_deriving"
+ppxopt(-ppx_driver,-custom_ppx) = "ppx_deriving,./ppx_deriving_argparse.cma"
+requires(ppx_driver) = "ppx_deriving.api"
+archive(ppx_driver, byte) = "ppx_deriving_argparse.cma"
+archive(ppx_driver, native) = "ppx_deriving_argparse.cmxa"
+exists_if = "ppx_deriving_argparse.cma"
