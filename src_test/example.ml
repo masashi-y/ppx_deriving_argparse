@@ -1,9 +1,11 @@
 
 type activation = Relu | Sigmoid | Tanh | Silu | Softmax
 
+
 let parse_activation = function 
     "relu" -> Relu | "sigmoid" -> Sigmoid | "tanh" -> Tanh | "silu" -> Silu | "softmax" -> Softmax
     | s -> raise (Invalid_argument s)
+
 
 let show_activation = function
     | Relu -> "relu"
@@ -12,21 +14,24 @@ let show_activation = function
     | Silu -> "silu"
     | Softmax -> "softmax"
 
+
 type t = {
-    src_vocab_size : int   [@help "the source vocabulary size"];
-    tgt_vocab_size : int   [@help "the target vocabulary size"];
-    num_units      : int   [@help "the number of units"];
-    nheads         : int   [@help "the number of multi-head attention"];
-    nlayers        : int   [@help "the number of layers"];
-    use_dropout    : bool  [@help "true if use dropout"];
-    dropout_rate   : float option [@help "dropout rate"];
-    test : int list option [@help "this is an test argument"];
+    src_vocab_size : int   (** the source vocabulary size *);
+    tgt_vocab_size : int   (** the target vocabulary size *);
+    num_units      : int   (** the number of units *);
+    nheads         : int   (** the number of multi-head attention *);
+    nlayers        : int   (** the number of layers *);
+    use_dropout    : bool  [@set_false] (** true if use dropout *);
+    dropout_rate   : float option (** dropout rate *);
+    test : int list option (** this is an test argument *);
     test2 : int option list;
-    activation : activation [@help "activation function in feed forward layers"]
+    activation : activation (** activation function in feed forward layers *)
                             [@print show_activation] [@parse parse_activation];
-    activation2 : activation [@help "activation function in feed forward layers"]
+    activation2 : activation (** activation function in feed forward layers *)
                             [@parse parse_activation];
-} [@@deriving argparse]
+} [@@deriving argparse { positional =
+        ["train", "file path to train file";
+         "eval", "file path to evaluation file"] }]
 
 
 let default = {
@@ -44,7 +49,7 @@ let default = {
 }
 
 let () =
-    let cfg, rest = argparse default Sys.argv in
-    argparse_perr cfg;
+    let cfg, rest = argparse default "example" Sys.argv in
+    prerr_argparse "example" cfg;
     Array.iter print_endline rest
 
