@@ -174,7 +174,7 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
   let usages0 = List.map (fun (s, _) -> String.uppercase_ascii s) positional in
   match type_decl.ptype_kind with
   | Ptype_record labels ->
-    let help_msg = [%expr Printf.eprintf "  %-*s:  show this help message and exit\n\n%!" spacing "-h, --help"] in
+    let help_msg = [%expr Printf.eprintf "  %-*s:  show this help message and exit\n\n%!" spacing "-h, -help"] in
     let msgs, cases, options, usage, spacing =
         List.fold_right (fun ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as pld) (msgs, cases, options, usages, spacing) ->
           let name_upper = String.uppercase_ascii name in
@@ -199,7 +199,7 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
           let msg = prerr_msg pld option_arg name msg0 in
           let spacing = max spacing (String.length option_arg) in
           msg :: msgs, cases, options, usage :: usages, spacing)
-        labels ([help_msg], error_cases, ["-h"], usages0, spacing) in
+        labels ([help_msg], error_cases, ["-h"; "-help"], usages0, spacing) in
     let cases = init_cases @ cases in
     let fields = List.map (fun { pld_name = { txt }} -> (txt, pvar txt)) labels in
     let usage = [%expr Format.eprintf [%e str ("\nUsage: %s @[" ^ String.concat " " usage ^ "@]\n")] progname] in
