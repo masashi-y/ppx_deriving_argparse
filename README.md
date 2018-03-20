@@ -7,34 +7,41 @@ Currently alpha version.
 type activation = Relu | Sigmoid | Tanh
 
 let parse_activation = function 
-    "relu" -> Relu | "sigmoid" -> Sigmoid | "tanh" -> Tanh 
+    "relu" -> Relu | "sigmoid" -> Sigmoid | "tanh" -> Tanh
     | s -> raise (Invalid_argument s)
 
 let show_activation = function
-    Relu -> "relu | Sigmoid -> "sigmoid" | Tanh -> "tanh"
+    Relu -> "relu" | Sigmoid -> "sigmoid" | Tanh -> "tanh"
 
 
 type t = {
-    src_vocab_size : int   (** the source vocabulary size *);
-    tgt_vocab_size : int   (** the target vocabulary size *);
-    num_units      : int   (** the number of units *);
-    nheads         : int   (** the number of multi-head attention *);
-    nlayers        : int   (** the number of layers *);
-    
+    src_vocab_size : int [@short "-s"]
+        (** the source vocabulary size *);
+    tgt_vocab_size : int [@short "-t"]
+        (** the target vocabulary size *);
+    num_units      : int [@short "-u"]
+        (** the number of units *);
+    nheads         : int [@short "-h"]
+        (** the number of multi-head attention *);
+    nlayers        : int
+        (** the number of layers *);
+        
     (* with [@set_false], "-use-dropout" turns the boolean value false. *)
-    use_dropout    : bool  [@set_false] (** true if use dropout *);
-    dropout_rate   : float option (** dropout rate *);
-    test : int list option (** this is an test argument *);
+    use_dropout    : bool  [@set_false]
+        (** true if use dropout *);
+    dropout_rate   : float option
+        (** dropout rate *);
+    test : int list option
+        (** this is an test argument *);
     test2 : int option list;
-    
-    (* arguments with a custom type *)
-    activation : activation (** activation function in feed forward layers *)
-                            [@print show_activation] [@parse parse_activation];
-    activation2 : activation (** activation function in feed forward layers *)
-                            [@parse parse_activation];
+    activation : activation [@print show_activation] [@parse parse_activation];
+        (** activation function in feed forward layers *)
+    activation2 : activation [@parse parse_activation];
+        (** activation function in feed forward layers *)
 } [@@deriving argparse { positional =
         ["train", "path to train file";
          "eval", "path to evaluation file"] }]
+
 
 (* default arguments *)
 let default = {
@@ -60,6 +67,7 @@ let () =
 derives a command line parser with an error message function:
 
 ```
+➜  ./example.byte -src-vocab-size 3 -t 100 train.txt test.txt
 
 Usage: example [-src-vocab-size SRC_VOCAB_SIZE]
                  [-tgt-vocab-size TGT_VOCAB_SIZE]  [-num-units NUM_UNITS]
@@ -68,21 +76,24 @@ Usage: example [-src-vocab-size SRC_VOCAB_SIZE]
                  [-activation ACTIVATION]  [-activation2 ACTIVATION2]
                  TRAIN EVAL
 
-Required:
-  TRAIN	: path to train file
-  EVAL	: path to evaluation file
+Arguments:
+  TRAIN                              : path to train file
+  EVAL                               : path to evaluation file
 
 Options:
-  -src-vocab-size SRC_VOCAB_SIZE	:  the source vocabulary size  {0}
-  -tgt-vocab-size TGT_VOCAB_SIZE	:  the target vocabulary size  {0}
-  -num-units NUM_UNITS	:  the number of units  {512}
-  -nheads NHEADS	:  the number of multi-head attention  {8}
-  -nlayers NLAYERS	:  the number of layers  {6}
-  -use-dropout	:  true if use dropout  {false}
-  -dropout-rate DROPOUT_RATE	:  dropout rate  {Some 0.1}
-  -test TEST	:  this is an test argument  {Some [1]}
-  -test2 TEST2	:  {[Some 1; Some 2; Some 3; None]}
-  -activation ACTIVATION	:  {relu}
-  -activation2 ACTIVATION2	:  {<unknown>}
-  -h, --help	show this help message and exit
+  -s, -src-vocab-size SRC_VOCAB_SIZE :  the source vocabulary size  {3}
+  -t, -tgt-vocab-size TGT_VOCAB_SIZE :  the target vocabulary size  {100}
+  -u, -num-units NUM_UNITS           :  the number of units  {512}
+  -h, -nheads NHEADS                 :  the number of multi-head attention  {8}
+  -nlayers NLAYERS                   :  the number of layers  {6}
+  -use-dropout                       :  true if use dropout  {true}
+  -dropout-rate DROPOUT_RATE         :  dropout rate  {0.1}
+  -test TEST                         :  this is an test argument  {[1, 2, 3]}
+  -test2 TEST2                       :  {[1, 2, 3, none]}
+  -activation ACTIVATION             :  activation function in feed forward layers  {relu}
+  -activation2 ACTIVATION2           :  activation function in feed forward layers  {<unknown>}
+  -h, --help                         :  show this help message and exit
+train.txt
+test.txt
 ```
+
