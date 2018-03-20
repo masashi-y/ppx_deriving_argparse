@@ -1,5 +1,6 @@
 # [@@deriving argparse]
 
+Currently alpha version.
 ```ocaml
 
 (* custom type with parse & print functions *)
