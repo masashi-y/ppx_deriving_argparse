@@ -175,8 +175,8 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
   match type_decl.ptype_kind with
   | Ptype_record labels ->
     let help_msg = [%expr Printf.eprintf "  %-*s:  show this help message and exit\n%!" spacing "-h, --help"] in
-    let msgs, cases, options, usage, spacing, _ =
-        List.fold_right (fun ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as pld) (msgs, cases, options, usages, spacing, shorts) ->
+    let msgs, cases, options, usage, spacing =
+        List.fold_right (fun ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as pld) (msgs, cases, options, usages, spacing) ->
           let name_upper = String.uppercase_ascii name in
           let option = "-" ^ (string_replace '_' '-' name) in
           let msg0 = match attr_help pld_attributes with
@@ -185,21 +185,21 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
           let usage = match pld_type with
               | [%type: bool] -> "[" ^ option ^ "]@ "
               | _ -> Printf.sprintf "[%s %s]@ " option name_upper in
-          let option_arg, cases, shorts, options = match attr_short pld_attributes with
+          let option_arg, cases, options = match attr_short pld_attributes with
             | None -> (match pld_type with
               | [%type: bool] -> option | _ -> option ^ " " ^ name_upper),
-                      make_case pld option :: cases, shorts, str option :: options
-            | Some short -> if List.mem short shorts then
+                      make_case pld option :: cases, option :: options
+            | Some short -> if List.mem short options then
                             raise_errorf ~loc 
                                 "deriver %s: duplicate short optional argument: \"%s\"" deriver short
                             else (short ^ ", " ^ match pld_type with
               | [%type: bool] -> option | _ -> option ^ " " ^ name_upper),
                       make_case pld short :: make_case pld option :: cases,
-                      short :: shorts, str short :: str option :: options in
+                      short :: option :: options in
           let msg = prerr_msg pld option_arg name msg0 in
           let spacing = max spacing (String.length option_arg) in
-          msg :: msgs, cases, options, usage :: usages, spacing, shorts)
-        labels ([help_msg], error_cases, [], usages0, spacing, ["-h"]) in
+          msg :: msgs, cases, options, usage :: usages, spacing)
+        labels ([help_msg], error_cases, ["-h"], usages0, spacing) in
     let cases = init_cases @ cases in
     let fields = List.map (fun { pld_name = { txt }} -> (txt, pvar txt)) labels in
     let usage = [%expr Format.eprintf [%e str ("\nUsage: %s @[" ^ String.concat " " usage ^ "@]\n")] progname] in
@@ -207,7 +207,7 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
             let spacing = [%e int (spacing + 1)] in
             [%e sequence (usage :: msg0 :: msgs)]] in
     let argparse = [%expr fun default progname args ->
-            let is_option o = List.mem o [%e list options] in
+            let is_option o = List.mem o [%e list (List.map str options)] in
             let rec aux cfg args =
                 try [%e Exp.match_ (evar "args") cases]
                 with Invalid_argument s ->
