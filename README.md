@@ -93,7 +93,7 @@ Options:
   -test2 TEST2                       :  {[1, 2, 3, none]}
   -activation ACTIVATION             :  activation function in feed forward layers  {relu}
   -activation2 ACTIVATION2           :  activation function in feed forward layers  {<unknown>}
-  -h, --help                         :  show this help message and exit
+  -h, -help                          :  show this help message and exit
 ```
 
 The parsing results are in `type t` for optional arguments and in `string array` for positional ones.
