@@ -22,7 +22,7 @@ type t = {
         (** the target vocabulary size *);
     num_units      : int [@short "-u"]
         (** the number of units *);
-    nheads         : int [@short "-h"]
+    nheads         : int [@short "-H"]
         (** the number of multi-head attention *);
     nlayers        : int
         (** the number of layers *);
