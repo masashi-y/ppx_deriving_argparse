@@ -174,7 +174,7 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
   let usages0 = List.map (fun (s, _) -> String.uppercase_ascii s) positional in
   match type_decl.ptype_kind with
   | Ptype_record labels ->
-    let help_msg = [%expr Printf.eprintf "  %-*s:  show this help message and exit\n%!" spacing "-h, --help"] in
+    let help_msg = [%expr Printf.eprintf "  %-*s:  show this help message and exit\n\n%!" spacing "-h, --help"] in
     let msgs, cases, options, usage, spacing =
         List.fold_right (fun ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as pld) (msgs, cases, options, usages, spacing) ->
           let name_upper = String.uppercase_ascii name in
