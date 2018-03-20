@@ -21,7 +21,7 @@ type t = {
         (** the target vocabulary size *);
     num_units      : int [@short "-u"]
         (** the number of units *);
-    nheads         : int [@short "-h"]
+    nheads         : int [@short "-H"]
         (** the number of multi-head attention *);
     nlayers        : int
         (** the number of layers *);
@@ -84,7 +84,7 @@ Options:
   -s, -src-vocab-size SRC_VOCAB_SIZE :  the source vocabulary size  {3}
   -t, -tgt-vocab-size TGT_VOCAB_SIZE :  the target vocabulary size  {100}
   -u, -num-units NUM_UNITS           :  the number of units  {512}
-  -h, -nheads NHEADS                 :  the number of multi-head attention  {8}
+  -H, -nheads NHEADS                 :  the number of multi-head attention  {8}
   -nlayers NLAYERS                   :  the number of layers  {6}
   -use-dropout                       :  true if use dropout  {true}
   -dropout-rate DROPOUT_RATE         :  dropout rate  {0.1}
