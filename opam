@@ -21,4 +21,5 @@ depends: [
   "cppo_ocamlbuild" {build}
   "ppx_deriving" {>= "3.2" & < "5.0"}
   "result"
+  "ounit"      {test}
 ]
