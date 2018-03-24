@@ -19,7 +19,9 @@ depends: [
   "ocamlfind"    {build}
   "cppo"         {build}
   "cppo_ocamlbuild" {build}
+  "ocaml-migrate-parsetree"
   "ppx_deriving" {>= "3.2" & < "5.0"}
+  "ppx_derivers"
   "result"
   "ounit"      {test}
 ]
