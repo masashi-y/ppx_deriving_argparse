@@ -22,6 +22,4 @@ depends: [
   "ocaml-migrate-parsetree"
   "ppx_deriving" {>= "3.2" & < "5.0"}
   "ppx_derivers"
-  "result"
-  "ounit"      {test}
 ]

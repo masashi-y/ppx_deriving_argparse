@@ -19,8 +19,8 @@ show: build
 	cd _build && ocamlfind ocamlc -dsource -c -g -bin-annot -safe-string \
 	-ppx 'ocamlfind ppx_import/ppx_import' \
 	-ppx 'ocamlfind ppx_deriving/ppx_deriving src/ppx_deriving_argparse.cma ' \
-	-I /Users/masashi-y/.opam/4.05.0/lib/ppx_deriving/ -package result -package \
-	oUnit -w @5@8@10@11@12@14@23@24@26@29@40 -I src_test -I src -o src_test/example.cmo src_test/example.ml
+	-I /Users/masashi-y/.opam/4.05.0/lib/ppx_deriving/ -package result \
+	-w @5@8@10@11@12@14@23@24@26@29@40 -I src_test -I src -o src_test/example.cmo src_test/example.ml
 
 doc:
 	$(OCAMLBUILD) doc/api.docdir/index.html \
