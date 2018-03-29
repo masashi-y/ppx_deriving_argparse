@@ -9,7 +9,7 @@ build:
 
 test: build
 	rm -rf _build/src_test/
-	$(OCAMLBUILD) src_test/test_ppx_deriving.byte --
+	$(OCAMLBUILD) src_test/test.byte --
 
 examples: build
 	rm -rf _build/src_test/

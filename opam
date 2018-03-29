@@ -12,7 +12,8 @@ build: [
                          "native-dynlink=%{ocaml-native-dynlink}%"
 ]
 build-test: [
-  "ocamlbuild" "-classic-display" "-use-ocamlfind" "src_test/example.byte" "--"
+  "ocamlbuild" "-classic-display" "-use-ocamlfind" "src_test/test.byte" "--"
+
 ]
 depends: [
   "ocamlbuild"   {build}
@@ -23,4 +24,5 @@ depends: [
   "ppx_deriving" {>= "3.2" & < "5.0"}
   "ppx_derivers"
   "result" {test}
+  "ounit" {test}
 ]

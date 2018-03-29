@@ -1,5 +1,7 @@
 
-type activation = Relu | Sigmoid | Tanh | Silu | Softmax
+open OUnit2
+
+type activation = Relu | Sigmoid | Tanh | Silu | Softmax [@@deriving show]
 
 
 let parse_activation = function 
@@ -37,7 +39,7 @@ type t = {
         (** activation function in feed forward layers *)
     activation2 : activation [@parse parse_activation];
         (** activation function in feed forward layers *)
-} [@@deriving argparse { positional =
+} [@@deriving show, argparse { positional =
         ["train", "path to train file";
          "eval", "path to evaluation file"] }]
 
@@ -59,5 +61,6 @@ let default = {
 let () =
     let cfg, rest = argparse default "example" Sys.argv in
     prerr_argparse "example" cfg;
+    print_endline (show cfg);
     Array.iter print_endline rest
 

@@ -9,7 +9,8 @@ let () = dispatch (fun phase ->
     in
     flag ["ocaml"; "compile"; "use_argparse"] &
       S[A"-ppx"; A("ocamlfind ppx_deriving/ppx_deriving "^
-                   "src/ppx_deriving_argparse.cma ");
+                   "src/ppx_deriving_argparse.cma "^
+                   (ppx_deriving_component "ppx_deriving_show.cma"));
         A"-I"; A(ppx_deriving_component "")];
     flag ["ocaml"; "link"; "use_argparse"; "byte"] &
       A(ppx_deriving_component "ppx_deriving_runtime.cma");

@@ -202,7 +202,7 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
         labels ([help_msg], error_cases, ["-h"; "-help"], usages0, spacing) in
     let cases = init_cases @ cases in
     let fields = List.map (fun { pld_name = { txt }} -> (txt, pvar txt)) labels in
-    let usage = [%expr Format.eprintf [%e str ("\nUsage: %s @[" ^ String.concat " " usage ^ "@]\n")] progname] in
+    let usage = [%expr Format.eprintf [%e str ("\nUsage: %s @[" ^ String.concat " " usage ^ "@]\n%!")] progname] in
     let prerr_fun = [%expr fun progname [%p precord fields] ->
             let spacing = [%e int (spacing + 1)] in
             [%e sequence (usage :: msg0 :: msgs)]] in
