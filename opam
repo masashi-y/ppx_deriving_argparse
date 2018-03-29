@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "ppx_deriving_argparse"
-version: "0.0.1"
+version: "0.0.3"
 maintainer: "Yoshikawa Masashi <yoshikawa.masashi.yh8@is.naist.jp>"
 authors: "Yoshikawa Masashi <yoshikawa.masashi.yh8@is.naist.jp>"
 homepage: "https://github.com/masashi-y/ppx_deriving_argparse"
