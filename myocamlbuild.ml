@@ -8,8 +8,7 @@ let () = dispatch (fun phase ->
       (Findlib.query "ppx_deriving").Findlib.location ^ "/" ^ deriver
     in
     flag ["ocaml"; "compile"; "use_argparse"] &
-      S[A"-ppx"; A"ocamlfind ppx_import/ppx_import";
-        A"-ppx"; A("ocamlfind ppx_deriving/ppx_deriving "^
+      S[A"-ppx"; A("ocamlfind ppx_deriving/ppx_deriving "^
                    "src/ppx_deriving_argparse.cma ");
         A"-I"; A(ppx_deriving_component "")];
     flag ["ocaml"; "link"; "use_argparse"; "byte"] &
