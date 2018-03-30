@@ -119,12 +119,12 @@ let get_parse_fun { pld_name = { txt = name; loc }; pld_type; pld_attributes } =
         | [%type: String.t]    -> wrap [%expr fun s -> s]
         | [%type: [%t? typ] list]  ->
                 let parse_comma_sep = [%expr fun v ->
-                    let v = String.split_on_char ',' v in
+                    let v = string_split_on_char ',' v in
                     List.map (fun v -> [%e aux typ] (String.trim v)) v] in
                 wrap parse_comma_sep
         | [%type: [%t? typ] array] ->
                 let parse_comma_sep = [%expr fun v ->
-                    let v = String.split_on_char ',' v in
+                    let v = string_split_on_char ',' v in
                     let v = List.map (fun v -> [%e aux typ] (String.trim v)) v in
                     Array.of_list v] in
                 wrap parse_comma_sep
@@ -207,6 +207,16 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
             let spacing = [%e int (spacing + 1)] in
             [%e sequence (usage :: msg0 :: msgs)]] in
     let argparse = [%expr fun default progname args ->
+            let string_split_on_char delim str =
+                let rec loop i last acc =
+                    if i = String.length str then
+                        String.sub str last (i - last) :: acc
+                    else if ((String.get str i) = delim) then
+                        loop (i + 1) (i + 1) (String.sub str last (i - last) :: acc)
+                    else
+                        loop (i + 1) last acc
+                in
+                List.rev (loop 0 0 []) in
             let is_option o = List.mem o [%e list (List.map str options)] in
             let rec aux cfg args =
                 try [%e Exp.match_ (evar "args") cases]
