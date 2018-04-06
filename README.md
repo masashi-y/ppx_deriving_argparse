@@ -143,7 +143,7 @@ test.txt
 ```
 
 For simplicity, `[@@argparse]` does not take care of the structure of positional arguments
-except that the resulting array's length is more than or equal to that of `positional` list.
+except that the resulting array's length is assured to be more than or equal to that of `positional` list.
 This can be exploited to do:
 ```ocaml
 [@@argparse { positional = ["files ...", "a list of files to process"] }]
