@@ -9,7 +9,10 @@ open Result
 let deriver = "argparse"
 let raise_errorf = Ppx_deriving.raise_errorf
 
-type options = { positional : (string * string) list }
+type options = {
+    positional : (string * string) list;
+    description : string
+}
 
 let string_pair = Ppx_deriving.Arg.(function
     | [%expr ([%e? a], [%e? b])] ->
@@ -21,11 +24,13 @@ let string_pair = Ppx_deriving.Arg.(function
 
 let parse_options options =
   let positional = ref [] in
+  let description = ref "" in
   options |> List.iter (fun (name, expr) ->
     match name with
     | "positional" -> positional := Ppx_deriving.Arg.(get_expr ~deriver (list string_pair)) expr
+    | "description" -> description := Ppx_deriving.Arg.(get_expr ~deriver string) expr
     | _ -> raise_errorf ~loc:expr.pexp_loc "%s does not support option %s" deriver name);
-  { positional = !positional }
+  { positional = !positional; description = !description }
 
 let attr_help attrs =
   Ppx_deriving.(attrs |> attr ~deriver "ocaml.doc" |> Arg.(get_attr ~deriver string))
@@ -146,7 +151,7 @@ let make_case ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as p
 
 
 let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
-  let { positional } = parse_options options in
+  let { positional; description } = parse_options options in
   let nargs = List.length positional in
   let prerrfun_name = Ppx_deriving.mangle_type_decl (`PrefixSuffix ("prerr", deriver)) type_decl in
   let argparse_name = Ppx_deriving.mangle_type_decl (`Prefix deriver) type_decl in
@@ -156,14 +161,14 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
           let expr = [%expr Printf.eprintf "  %-*s: %s\n" spacing [%e str (String.uppercase_ascii name)] [%e str help]] in
           let spacing = max spacing (String.length name) in
           expr :: exprs, spacing) positional ([msg0], 0) in
-  let msg0 = sequence ([%expr prerr_endline "\nArguments:"] :: msg0) in
+  let args = sequence ([%expr prerr_endline "\nArguments:"] :: msg0) in
   let error_cases = 
         [Exp.case [%pat? arg :: rest] ~guard:[%expr is_option arg]
             [%expr Printf.eprintf "PARSE ERROR: Option without required argument: \"%s\"\n" arg;
-            [%e evar prerrfun_name] progname default; exit 2];
+            usage_and_die ()];
         Exp.case [%pat? arg :: rest] ~guard:[%expr arg.[0] = '-']
             [%expr Printf.eprintf "PARSE ERROR: Invalid option: \"%s\"\n" arg;
-            [%e evar prerrfun_name] progname default; exit 2];
+            usage_and_die ()];
         Exp.case [%pat? rest] [%expr (cfg, rest)]] in
   let init_cases =
         [Exp.case (pnil ()) [%expr (cfg, [])];
@@ -201,10 +206,14 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
         labels ([help_msg], error_cases, ["-h"; "-help"], usages0, spacing) in
     let cases = init_cases @ cases in
     let fields = List.map (fun { pld_name = { txt }} -> (txt, pvar txt)) labels in
-    let usage = [%expr Format.eprintf [%e str ("\nUsage: %s @[" ^ String.concat " " usage ^ "@]\n%!")] progname] in
+    let usage = [%expr Format.eprintf
+            [%e str ("Usage: %s @[[-help] " ^ String.concat " " usage ^ "@]\n%!")] progname] in
+    let descr = match description with
+        | "" -> unit ()
+        | descr -> [%expr Format.eprintf [%e str ("\n" ^ descr ^ "\n%!")]] in
     let prerr_fun = [%expr fun progname [%p precord fields] ->
             let spacing = [%e int (spacing + 1)] in
-            [%e sequence (usage :: msg0 :: msgs)]] in
+            [%e sequence (usage :: descr :: args :: msgs)]] in
     let argparse = [%expr fun default progname args ->
             let string_split_on_char delim str =
                 let rec loop i last acc =
@@ -217,15 +226,16 @@ let str_of_type ~options ~path ({ ptype_loc = loc } as type_decl) =
                 in
                 List.rev (loop 0 0 []) in
             let is_option o = List.mem o [%e list (List.map str options)] in
+            let usage_and_die () = [%e usage]; exit 2 in
             let rec aux cfg args =
                 try [%e Exp.match_ (evar "args") cases]
                 with Invalid_argument s ->
                     Printf.eprintf "PARSE ERROR: Invalid argument for keyword option \"%s\": \"%s\"\n"
-                    (List.hd args) s; [%e evar prerrfun_name] progname default; exit 2 in
+                    (List.hd args) s; usage_and_die () in
             let cfg, rest = aux default (List.tl (Array.to_list args)) in
             if List.length rest < [%e int nargs] then
                 (Printf.eprintf "PARSE ERROR: Invalid number of required arguments\n";
-                [%e evar prerrfun_name] progname default; exit 2);
+                usage_and_die (); exit 2);
             cfg, Array.of_list rest] in
     [Vb.mk (pvar prerrfun_name) (Ppx_deriving.sanitize ~quoter prerr_fun);
      Vb.mk (pvar argparse_name) (Ppx_deriving.sanitize ~quoter argparse)]
