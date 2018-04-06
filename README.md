@@ -1,5 +1,14 @@
 # [@@deriving argparse]
 
+## Install
+
+Available from opam:
+```sh
+➜  opam install ppx_deriving_argparse
+```
+
+## Usage
+
 ```ocaml
 
 (* custom type with parse & print functions *)
@@ -66,7 +75,7 @@ let () =
 
 derives a command line parser with an error message function:
 
-```
+```sh
 ➜  ./example.byte -src-vocab-size 3 -t 100 -activation relu -test "1,1,1" train.txt test.txt
 
 Usage: example [-src-vocab-size SRC_VOCAB_SIZE]
