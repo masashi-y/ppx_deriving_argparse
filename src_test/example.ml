@@ -1,8 +1,8 @@
 
-open OUnit2
+
+(* Simple neural network example *)
 
 type activation = Relu | Sigmoid | Tanh | Silu | Softmax [@@deriving show]
-
 
 let parse_activation = function 
     "relu" -> Relu | "sigmoid" -> Sigmoid | "tanh" -> Tanh | "silu" -> Silu | "softmax" -> Softmax
@@ -10,46 +10,51 @@ let parse_activation = function
 
 
 let show_activation = function
-    | Relu -> "relu"
-    | Sigmoid -> "sigmoid"
-    | Tanh -> "tanh"
-    | Silu -> "silu"
-    | Softmax -> "softmax"
+    | Relu -> "relu" | Sigmoid -> "sigmoid" | Tanh -> "tanh" | Silu -> "silu" | Softmax -> "softmax"
 
 
 type t = {
-    src_vocab_size : int [@short "-s"]
-        (** the source vocabulary size *);
-    tgt_vocab_size : int [@short "-t"]
-        (** the target vocabulary size *);
-    num_units      : int [@short "-u"]
-        (** the number of units *);
-    nheads         : int [@short "-H"]
-        (** the number of multi-head attention *);
-    nlayers        : int
+    nlayers        : int   [@short "-l"]
         (** the number of layers *);
+
+    (* with [@set_false], "-use-dropout" flag turns the value false. *)
     use_dropout    : bool  [@set_false]
         (** true if use dropout *);
+
     dropout_rate   : float option
         (** dropout rate *);
+
     test : int list option
         (** this is an test argument *);
+
     test2 : int option list;
+
+    (* arguments with custom type *)
     activation : activation [@print show_activation] [@parse parse_activation];
         (** activation function in feed forward layers *)
+
     activation2 : activation [@parse parse_activation];
         (** activation function in feed forward layers *)
-} [@@deriving show, argparse { positional =
-        ["train", "path to train file";
-         "eval", "path to evaluation file"] }]
+} [@@deriving show, argparse {
+    (* You can pass positional argument, which is (string * string) list.  *)
+    positional = 
+        ["train", "train file";
+        "eval", "some file"];
+
+    (* also some description. *)
+    description = "some neural networks";
+}]
+
+(*
+   You can omit either of positional and description:
+   e.g. [@@ argparse { description = "some ..." }]
+   or entirely: [@@ argparse]
+*)
 
 
+(* default arguments *)
 let default = {
-    src_vocab_size = 0;
-    tgt_vocab_size = 0;
-    num_units = 512;
-    nheads = 8;
-    nlayers = 6;
+    nlayers = 2;
     use_dropout = true;
     dropout_rate = Some 0.1;
     test = Some [1;2;3];
