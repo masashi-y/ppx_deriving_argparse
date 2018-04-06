@@ -129,13 +129,12 @@ let get_parse_fun { pld_name = { txt = name; loc }; pld_type; pld_attributes } =
                     Array.of_list v] in
                 wrap parse_comma_sep
         | [%type: [%t? typ] option] -> wrap [%expr fun v -> Some ([%e aux typ] v)]
-        | _ -> begin match attr_parse pld_attributes with
-            | Some f -> wrap f
-            | None -> raise_errorf ~loc "deriver %s requires [@parse] annotation for type: %s"
-                                         deriver (Ppx_deriving.string_of_core_type pld_type)
-        end
+        | _ -> raise_errorf ~loc "deriver %s requires [@parse] annotation for type: %s"
+                                 deriver (Ppx_deriving.string_of_core_type pld_type)
     in
-    aux pld_type
+    match attr_parse pld_attributes with
+    | Some f -> wrap f
+    | None -> aux pld_type
 
 
 let make_case ({ pld_name = { txt = name; loc }; pld_type; pld_attributes } as pld) option = match pld_type with
